@@ -3,7 +3,8 @@ import networkx as nx
 import networkx.algorithms.community as nx_comm
 import matplotlib.pyplot as plt
 import numpy as np
-
+from cdlib import algorithms
+from datetime import datetime
 
 class NetworkAnalyzer:
 
@@ -109,6 +110,55 @@ class NetworkAnalyzer:
                     node_color=nc,
                     )
         plt.show()
+
+    @classmethod
+    def comm_num_series(cls):
+        y = []
+        x = []
+        for i in range(1, 1066):
+            try:
+                df = pd.read_csv("./transaction_data/1000/{}.csv".format(i))
+                df["weight"] = [a for a in df["value"]]
+                G = nx.from_pandas_edgelist(df, source="from", target="to", edge_attr="weight")
+                if len(df) == 1000:
+                    comm_num = len(algorithms.walktrap(G).communities)
+                    y.append(comm_num)
+                    x.append(i)
+            except KeyError:
+                pass
+            except nx.exception.AmbiguousSolution:
+                pass
+            except ValueError:
+                pass
+            except TypeError:  # I really don't know why this happens all the time, so I have to give up some data
+                pass
+        return y, x
+
+    @classmethod
+    def comm_num_time_scatter(cls):
+        y = []
+        x = []
+        for i in range(1, 1066):
+            try:
+                df = pd.read_csv("./transaction_data/1000/{}.csv".format(i))
+                df["weight"] = [a for a in df["value"]]
+                G = nx.from_pandas_edgelist(df, source="from", target="to", edge_attr="weight")
+                if len(df) == 1000:
+                    comm_num = len(algorithms.walktrap(G).communities)
+                    y.append(comm_num)
+                    time = datetime.strptime(df['metadata'][999], r"{'blockTimestamp': '%Y-%m-%dT%H:%M:%S.%fZ'}")
+                    #  fit in time data
+                    #  {'blockTimestamp': '2023-02-09T05:53:47.000Z'}
+                    x.append(time)
+            except KeyError:
+                pass
+            except nx.exception.AmbiguousSolution:
+                pass
+            except ValueError:
+                pass
+            except TypeError:  # I really don't know why this happens all the time, so I have to give up some data
+                pass
+        return y, x
 
     @classmethod
     def _position_communities(cls, g, partition, **kwargs):

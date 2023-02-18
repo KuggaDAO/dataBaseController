@@ -7,8 +7,9 @@ import cProfile, pstats
 
 import pandas as pd
 from ruamel import yaml
-from cdlib import algorithms
+
 from Analyze import *
+from datetime import datetime
 
 # load attributes
 with open('./attributes.yaml', 'r') as f:
@@ -21,25 +22,36 @@ addresses = configs['contracts']['MEDIUM']
 #networkAnalyzer.apply_all_and_output(addresses, DataFetcher.give_transaction_variety, 'var_med.csv')
 #print(NetworkAnalyzer.give_clustering("./transaction_data/PLU10000.csv"))
 
-"""
-# the part that plots community numbers.
-y = []
-for i in range(1065):
-    try:
-        df = pd.read_csv("./transaction_data/1000/{}.csv".format(i))
-        df["weight"] = [a for a in df["value"]]
-        G = nx.from_pandas_edgelist(df, source="from", target="to", edge_attr="weight")
-        if len(df) == 1000:
-            y.append(len(nx_comm.louvain_communities(G)))
-    except KeyError:
-        pass
-    except nx.exception.AmbiguousSolution:
-        pass
-    except ValueError:
-        pass
-plt.plot(y)
+y, x = NetworkAnalyzer.comm_num_time_scatter()
+plt.scatter(x, y)
+plt.gca().invert_xaxis()
 plt.show()
 """
+# the part that plots community numbers.
+y, x = NetworkAnalyzer.comm_num_series()
+fig, ax = plt.subplots()
+# ax.scatter(x, y)
+
+# the part that plots all time data
+times = []
+xx = []
+for i in range(1, 1066):
+    df = pd.read_csv("./transaction_data/1000/{}.csv".format(i))
+    if len(df) == 1000:
+        exec("s = " + df['metadata'][999])
+        time = datetime.strptime(s['blockTimestamp'], r"%Y-%m-%dT%H:%M:%S.%fZ")  # fit in time data
+        times.append(time)
+        xx.append(i)
+ax2 = ax.twinx()
+# ax2.scatter(xx, times, color="red")
+
+times_x = []
+for i in x:
+    times_x.append(times[i])
+ax.scatter(times_x, y)
+plt.show()
+"""
+
 
 """
 # the part that plots degree frequencies

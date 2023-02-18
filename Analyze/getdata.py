@@ -41,7 +41,7 @@ class DataFetcher:
             "params": [
                 {
                     "fromBlock": "0x0",
-                    "toBlock": "0xfc9f42",
+                    "toBlock": "0xfd21b6",
                     "contractAddresses": [address],
                     "category": ["erc20"],
                     "withMetadata": True,
@@ -179,7 +179,7 @@ class DataFetcher:
                         put this to true if you want to reverse
         :return: True
         """
-        for adr_num in range(1, len(addresses)):
+        for adr_num in range(823, len(addresses)):
             df = DataFetcher.get_n_thousand(addresses[adr_num], apikey, num, reverse=reverse)
             df.to_csv('./transaction_data/{0}/{1}.csv'.format(num * 1000, adr_num))
         return True
